@@ -18,6 +18,19 @@ schedule::schedule(QWidget *parent)
         }
     }
     struct info save[1000];
+    save_file_reader();
+    for(int j = 0 ; j < cnt ; j++){
+        cout << (int)_save[j].num << " ";
+        for(int i = 0 ; i < 5 ; i++ ) cout << _save[j].text[i] << " ";
+        for(int i = 0 ; i < 35 ; i++ ) cout << _save[j].timetable[i] << " ";
+        cout << _save[j].location << " ";
+        for(int i = 0 ; i < 3 ; i++ ) cout << _save[j].want_time[i] << " ";
+        cout << _save[j].question << endl;
+    }
+    int cpy = cnt;
+    string string_cnt = to_string(cpy);
+    QString my = QString::fromStdString(string_cnt);
+    ui->current_cnt->setText(my);
 }
 
 schedule::~schedule()
@@ -163,14 +176,174 @@ void schedule::save_file_reader(void){
     file.close();
 }
 
-void schedule::on_save_btn_clicked(){
+void schedule::load_robit(void){
+    ifstream file;
+    file.open("/Users/michael/Desktop/CODE/QTCreator/schedule_manager_00/schedule_manager/robit.txt", ios::in);
+    cnt_robit = 0;
+    while(true){
+        if(file.eof()) break;
+        file >> _save[cnt_robit+99].num;
+        if(file.eof()) break;
+        for(int i = 0 ; i < 5 ; i++ ) file >> _save[cnt_robit+99].text[i];
+        if(file.eof()) break;
+        for(int i = 0 ; i < 35 ; i++ ) file >> _save[cnt_robit+99].timetable[i];
+        if(file.eof()) break;
+        file >> _save[cnt_robit+99].location;
+        if(file.eof()) break;
+        for(int i = 0 ; i < 3 ; i++ ) file >> _save[cnt_robit+99].want_time[i];
+        if(file.eof()) break;
+        file >> _save[cnt_robit+99].question;
+        if(file.eof()) break;
+        cnt_robit ++;
+    }
+    for(int i = 0 ; i < 7 ; i++)robit_name[i] = _save[i+99].text[0];
+    file.close();
+    for(const auto& option : robit_name) optionlist << QString::fromStdString(option);
+    ui->robit_list->addItems(optionlist);
+}
 
+void schedule::load_new(void){
+    ifstream file;
+    file.open("/Users/michael/Desktop/CODE/QTCreator/schedule_manager_00/schedule_manager/save.txt", ios::in);
+    cnt = 0;
+    while(true){
+        if(file.eof()) break;
+        file >> _save[cnt].num;
+        if(file.eof()) break;
+        for(int i = 0 ; i < 5 ; i++ ) file >> _save[cnt].text[i];
+        if(file.eof()) break;
+        for(int i = 0 ; i < 35 ; i++ ) file >> _save[cnt].timetable[i];
+        if(file.eof()) break;
+        file >> _save[cnt].location;
+        if(file.eof()) break;
+        for(int i = 0 ; i < 3 ; i++ ) file >> _save[cnt].want_time[i];
+        if(file.eof()) break;
+        file >> _save[cnt].question;
+        if(file.eof()) break;
+        cnt ++;
+    }
+    for(int i = 0 ; i < cnt ; i++)new_name[i] = _save[i].text[0];
+    file.close();
+    for(const auto& option : new_name) optionlist_2 << QString::fromStdString(option);
+    ui->new_list->addItems(optionlist_2);
+}
+
+void schedule::fill_robit_timetable(void){
+    for(int i = 0 ; i < 7 ; i++){
+        for (int j = 0 ; j < 6 ; j++) {
+            QTableWidgetItem *item = new QTableWidgetItem();
+            item->setBackground(Qt::white);
+            ui->robit_time->setItem(i, j, item);
+        }
+    }
+    int number = ui->robit_list->currentIndex();
+    for(int i = 0 ; i < 35 ; i++){
+        if(_save[99+number-1].timetable[i] == 1){
+            QTableWidgetItem *item = new QTableWidgetItem();
+            item->setBackground(Qt::yellow);
+            int x, y;
+            x = i % 7;
+            y = (i / 7);
+            ui->robit_time->setItem(x, y, item);
+        }
+    }
+}
+
+void schedule::fill_new_timetable(void){
+    for(int i = 0 ; i < 7 ; i++){
+        for (int j = 0 ; j < 6 ; j++) {
+            QTableWidgetItem *item = new QTableWidgetItem();
+            item->setBackground(Qt::white);
+            ui->new_time->setItem(i, j, item);
+        }
+    }
+    int number = ui->new_list->currentIndex();
+    for(int i = 0 ; i < 35 ; i++){
+        if(_save[number-1].timetable[i] == 1){
+            QTableWidgetItem *item = new QTableWidgetItem();
+            item->setBackground(Qt::red);
+            int x, y;
+            x = i % 7;
+            y = (i / 7);
+            ui->new_time->setItem(x, y, item);
+        }
+    }
+}
+
+void schedule::merge_timetable(void){
+    for(int i = 0 ; i < 7 ; i++){
+        for (int j = 0 ; j < 6 ; j++) {
+            QTableWidgetItem *item = new QTableWidgetItem();
+            item->setBackground(Qt::white);
+            ui->new_time->setItem(i, j, item);
+        }
+    }
+    int number = ui->new_list->currentIndex();
+    int ro_number = ui->robit_list->currentIndex();
+    for(int i = 0 ; i < 35 ; i++){
+        if(_save[number-1].timetable[i] == 1 && _save[99+number-1].timetable[i] != 1){
+            QTableWidgetItem *item = new QTableWidgetItem();
+            item->setBackground(Qt::red);
+            int x, y;
+            x = i % 7;
+            y = (i / 7);
+            ui->new_time->setItem(x, y, item);
+        }
+        else if(_save[number-1].timetable[i] == 1 && _save[99+number-1].timetable[i] == 1){
+            QTableWidgetItem *item = new QTableWidgetItem();
+            item->setBackground(Qt::blue);
+            int x, y;
+            x = i % 7;
+            y = (i / 7);
+            ui->new_time->setItem(x, y, item);
+        }
+        else if(_save[number-1].timetable[i] != 1 && _save[99+number-1].timetable[i] == 1){
+            QTableWidgetItem *item = new QTableWidgetItem();
+            item->setBackground(Qt::yellow);
+            int x, y;
+            x = i % 7;
+            y = (i / 7);
+            ui->new_time->setItem(x, y, item);
+        }
+    }
+}
+
+void schedule::setui_info(void){
+    QString my_name = QString::fromStdString(_save[ui->new_list->currentIndex()-1].text[0]);
+    ui->new_name->setText(my_name);
+
+    QString my_student_num = QString::fromStdString(_save[ui->new_list->currentIndex()-1].text[1]);
+    ui->new_student_num->setText(my_student_num);
+
+    QString my_phone = QString::fromStdString(_save[ui->new_list->currentIndex()-1].text[2]);
+    ui->new_phone_num->setText(my_phone);
+
+    QString my_depart = QString::fromStdString(_save[ui->new_list->currentIndex()-1].text[3]);
+    ui->new_department->setText(my_depart);
+
+    QString my_mbti = QString::fromStdString(_save[ui->new_list->currentIndex()-1].text[4]);
+    ui->new_MBTI->setText(my_mbti);
+
+    if(_save[ui->new_list->currentIndex()-1].location == 1) ui->new_location->setText("통학");
+    else if(_save[ui->new_list->currentIndex()-1].location == 2) ui->new_location->setText("기숙사");
+    else if(_save[ui->new_list->currentIndex()-1].location == 3) ui->new_location->setText("학교 주변");
+
+    QString my_time_like = QString::fromStdString(_save[ui->new_list->currentIndex()-1].want_time[0]);
+    ui->new_time_like->setText(my_time_like);
+
+    QString my_q = QString::fromStdString(_save[ui->new_list->currentIndex()-1].question);
+    ui->new_time_like->setText(my_q);
+
+}
+
+void schedule::on_save_btn_clicked(){
     if(!check_stat()) return;
     whole_save_func();
     text_clear_func();
 }
 
 void schedule::on_day_list_currentIndexChanged(int index){
+    for(int i = 0; i < 7 ; i ++) time_cnt[i] = 0;
     if(ui->first_time->isChecked() == false &&
        ui->second_time->isChecked() == false &&
        ui->third_time->isChecked() == false &&
@@ -197,7 +370,6 @@ void schedule::on_day_list_currentIndexChanged(int index){
         ui->sixth_time->setChecked(false);
         ui->no_time->setChecked(false);
         current_day = ui->day_list->currentIndex();
-
     }
 }
 
@@ -226,58 +398,148 @@ void schedule::on_time_btn_clicked()
 void schedule::on_first_time_clicked()
 {
     time_save_func();
-    QTableWidgetItem *item = new QTableWidgetItem();
-    item->setBackground(Qt::yellow);
-    ui->timetable->setItem(0, current_day, item);
+    if(time_cnt[0] == 0){
+        QTableWidgetItem *item = new QTableWidgetItem();
+        item->setBackground(Qt::yellow);
+        ui->timetable->setItem(0, current_day, item);
+        time_cnt[0] = 1;
+    }
+    else if(time_cnt[0] == 1){
+        QTableWidgetItem *item = new QTableWidgetItem();
+        item->setBackground(Qt::white);
+        ui->timetable->setItem(0, current_day, item);
+        time_cnt[0] = 0;
+    }
 }
 
 void schedule::on_second_time_clicked()
 {
     time_save_func();
-    QTableWidgetItem *item = new QTableWidgetItem();
-    item->setBackground(Qt::yellow);
-    ui->timetable->setItem(1, current_day, item);
+    if(time_cnt[1] == 0){
+        QTableWidgetItem *item = new QTableWidgetItem();
+        item->setBackground(Qt::yellow);
+        ui->timetable->setItem(1, current_day, item);
+        time_cnt[1] = 1;
+    }
+    else if(time_cnt[1] == 1){
+        QTableWidgetItem *item = new QTableWidgetItem();
+        item->setBackground(Qt::white);
+        ui->timetable->setItem(1, current_day, item);
+        time_cnt[1] = 0;
+    }
 }
 
 void schedule::on_third_time_clicked()
 {
     time_save_func();
-    QTableWidgetItem *item = new QTableWidgetItem();
-    item->setBackground(Qt::yellow);
-    ui->timetable->setItem(2, current_day, item);
+    if(time_cnt[2] == 0){
+        QTableWidgetItem *item = new QTableWidgetItem();
+        item->setBackground(Qt::yellow);
+        ui->timetable->setItem(2, current_day, item);
+        time_cnt[2] = 1;
+    }
+    else if(time_cnt[2] == 1){
+        QTableWidgetItem *item = new QTableWidgetItem();
+        item->setBackground(Qt::white);
+        ui->timetable->setItem(2, current_day, item);
+        time_cnt[2] = 0;
+    }
 }
 
 void schedule::on_fourth_time_clicked()
 {
     time_save_func();
-    QTableWidgetItem *item = new QTableWidgetItem();
-    item->setBackground(Qt::yellow);
-    ui->timetable->setItem(3, current_day, item);
+    if(time_cnt[3] == 0){
+        QTableWidgetItem *item = new QTableWidgetItem();
+        item->setBackground(Qt::yellow);
+        ui->timetable->setItem(3, current_day, item);
+        time_cnt[3] = 1;
+    }
+    else if(time_cnt[3] == 1){
+        QTableWidgetItem *item = new QTableWidgetItem();
+        item->setBackground(Qt::white);
+        ui->timetable->setItem(3, current_day, item);
+        time_cnt[3] = 0;
+    }
 }
 
 void schedule::on_fifth_time_clicked()
 {
     time_save_func();
-    QTableWidgetItem *item = new QTableWidgetItem();
-    item->setBackground(Qt::yellow);
-    ui->timetable->setItem(4, current_day, item);
+    if(time_cnt[4] == 0){
+        QTableWidgetItem *item = new QTableWidgetItem();
+        item->setBackground(Qt::yellow);
+        ui->timetable->setItem(4, current_day, item);
+        time_cnt[4] = 1;
+    }
+    else if(time_cnt[4] == 1){
+        QTableWidgetItem *item = new QTableWidgetItem();
+        item->setBackground(Qt::white);
+        ui->timetable->setItem(4, current_day, item);
+        time_cnt[4] = 0;
+    }
 }
 
 void schedule::on_sixth_time_clicked()
 {
     time_save_func();
-    QTableWidgetItem *item = new QTableWidgetItem();
-    item->setBackground(Qt::yellow);
-    ui->timetable->setItem(5, current_day, item);
+    if(time_cnt[5] == 0){
+        QTableWidgetItem *item = new QTableWidgetItem();
+        item->setBackground(Qt::yellow);
+        ui->timetable->setItem(5, current_day, item);
+        time_cnt[5] = 1;
+    }
+    else if(time_cnt[5] == 1){
+        QTableWidgetItem *item = new QTableWidgetItem();
+        item->setBackground(Qt::white);
+        ui->timetable->setItem(5, current_day, item);
+        time_cnt[5] = 0;
+    }
 }
 
 void schedule::on_no_time_clicked()
 {
     time_save_func();
-    QTableWidgetItem *item = new QTableWidgetItem();
-    item->setBackground(Qt::yellow);
-    ui->timetable->setItem(6, current_day, item);
+    for(int i = 0 ; i < 7 ; i++){
+        QTableWidgetItem *item = new QTableWidgetItem();
+        item->setBackground(Qt::white);
+        ui->timetable->setItem(i, current_day, item);
+    }
+    ui->first_time->setChecked(false);
+    ui->second_time->setChecked(false);
+    ui->third_time->setChecked(false);
+    ui->fourth_time->setChecked(false);
+    ui->fifth_time->setChecked(false);
+    ui->sixth_time->setChecked(false);
+
+}
+
+void schedule::on_load_list_clicked()
+{
+    if(load_cnt == 0){
+        load_robit();
+        load_new();
+        load_cnt ++;
+    }
+    else{
+        QMessageBox::critical(this, "WARNING", "이미 값을 불러왔습니다.");
+    }
+}
+
+void schedule::on_robit_set_btn_clicked()
+{
+    fill_robit_timetable();
+}
+
+void schedule::on_new_set_btn_clicked()
+{
+    fill_new_timetable();
+    setui_info();
 }
 
 
+void schedule::on_merge_btn_clicked()
+{
+    merge_timetable();
+}
 
