@@ -61,7 +61,7 @@ public:
     void fill_new_timetable(void);
     void merge_timetable(void);
     void setui_info(void);
-
+    void setui_info_ro(void);
 
 private slots:
     void on_save_btn_clicked();

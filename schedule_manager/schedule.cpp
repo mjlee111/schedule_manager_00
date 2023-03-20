@@ -8,7 +8,7 @@ schedule::schedule(QWidget *parent)
     , ui(new Ui::schedule)
 {
     ui->setupUi(this);
-    QApplication::setWindowIcon(QIcon("icon.ico"));
+    QApplication::setWindowIcon(QIcon(":/icon.ico"));
     current_day = ui->day_list->currentIndex();
     for(int i = 0 ; i < 7 ; i++){
         for (int j = 0 ; j < 6 ; j++) {
@@ -18,15 +18,8 @@ schedule::schedule(QWidget *parent)
         }
     }
     struct info save[1000];
+
     save_file_reader();
-    for(int j = 0 ; j < cnt ; j++){
-        cout << (int)_save[j].num << " ";
-        for(int i = 0 ; i < 5 ; i++ ) cout << _save[j].text[i] << " ";
-        for(int i = 0 ; i < 35 ; i++ ) cout << _save[j].timetable[i] << " ";
-        cout << _save[j].location << " ";
-        for(int i = 0 ; i < 3 ; i++ ) cout << _save[j].want_time[i] << " ";
-        cout << _save[j].question << endl;
-    }
     int cpy = cnt;
     string string_cnt = to_string(cpy);
     QString my = QString::fromStdString(string_cnt);
@@ -281,7 +274,7 @@ void schedule::merge_timetable(void){
     int number = ui->new_list->currentIndex();
     int ro_number = ui->robit_list->currentIndex();
     for(int i = 0 ; i < 35 ; i++){
-        if(_save[number-1].timetable[i] == 1 && _save[99+number-1].timetable[i] != 1){
+        if(_save[number-1].timetable[i] == 1 && _save[99+ro_number-1].timetable[i] != 1){
             QTableWidgetItem *item = new QTableWidgetItem();
             item->setBackground(Qt::red);
             int x, y;
@@ -289,7 +282,7 @@ void schedule::merge_timetable(void){
             y = (i / 7);
             ui->new_time->setItem(x, y, item);
         }
-        else if(_save[number-1].timetable[i] == 1 && _save[99+number-1].timetable[i] == 1){
+        else if(_save[number-1].timetable[i] == 1 && _save[99+ro_number-1].timetable[i] == 1){
             QTableWidgetItem *item = new QTableWidgetItem();
             item->setBackground(Qt::blue);
             int x, y;
@@ -297,7 +290,7 @@ void schedule::merge_timetable(void){
             y = (i / 7);
             ui->new_time->setItem(x, y, item);
         }
-        else if(_save[number-1].timetable[i] != 1 && _save[99+number-1].timetable[i] == 1){
+        else if(_save[number-1].timetable[i] != 1 && _save[99+ro_number-1].timetable[i] == 1){
             QTableWidgetItem *item = new QTableWidgetItem();
             item->setBackground(Qt::yellow);
             int x, y;
@@ -331,9 +324,35 @@ void schedule::setui_info(void){
     QString my_time_like = QString::fromStdString(_save[ui->new_list->currentIndex()-1].want_time[0]);
     ui->new_time_like->setText(my_time_like);
 
-    QString my_q = QString::fromStdString(_save[ui->new_list->currentIndex()-1].question);
-    ui->new_time_like->setText(my_q);
+    QString my_t = QString::fromStdString(_save[ui->new_list->currentIndex()-1].want_time[0]);
+    ui->new_time_like->setText(my_t);
 
+    QString my_q = QString::fromStdString(_save[ui->new_list->currentIndex()-1].question);
+    ui->new_question->setText(my_q);
+}
+
+void schedule::setui_info_ro(void){
+    QString my_name = QString::fromStdString(_save[ui->robit_list->currentIndex()-1+99].text[0]);
+    ui->ro_name->setText(my_name);
+
+    QString my_student_num = QString::fromStdString(_save[ui->robit_list->currentIndex()-1+99].text[1]);
+    ui->ro_student_num->setText(my_student_num);
+
+    QString my_phone = QString::fromStdString(_save[ui->robit_list->currentIndex()-1+99].text[2]);
+    ui->ro_phone_num->setText(my_phone);
+
+    QString my_depart = QString::fromStdString(_save[ui->robit_list->currentIndex()-1+99].text[3]);
+    ui->ro_department->setText(my_depart);
+
+    QString my_mbti = QString::fromStdString(_save[ui->robit_list->currentIndex()-1+99].text[4]);
+    ui->ro_MBTI->setText(my_mbti);
+
+    if(_save[ui->robit_list->currentIndex()-1+99].location == 1) ui->ro_location->setText("통학");
+    else if(_save[ui->robit_list->currentIndex()-1+99].location == 2) ui->ro_location->setText("기숙사");
+    else if(_save[ui->robit_list->currentIndex()-1+99].location == 3) ui->ro_location->setText("학교 주변");
+
+    QString my_time_like = QString::fromStdString(_save[ui->robit_list->currentIndex()-1+99].want_time[0]);
+    ui->ro_time->setText(my_time_like);
 }
 
 void schedule::on_save_btn_clicked(){
@@ -376,14 +395,6 @@ void schedule::on_day_list_currentIndexChanged(int index){
 void schedule::on_load_btn_clicked()
 {
     save_file_reader();
-    for(int j = 0 ; j < cnt ; j++){
-        cout << (int)_save[j].num << " ";
-        for(int i = 0 ; i < 5 ; i++ ) cout << _save[j].text[i] << " ";
-        for(int i = 0 ; i < 35 ; i++ ) cout << _save[j].timetable[i] << " ";
-        cout << _save[j].location << " ";
-        for(int i = 0 ; i < 3 ; i++ ) cout << _save[j].want_time[i] << " ";
-        cout << _save[j].question << endl;
-    }
     int cpy = cnt;
     string string_cnt = to_string(cpy);
     QString my = QString::fromStdString(string_cnt);
@@ -529,6 +540,7 @@ void schedule::on_load_list_clicked()
 void schedule::on_robit_set_btn_clicked()
 {
     fill_robit_timetable();
+    setui_info_ro();
 }
 
 void schedule::on_new_set_btn_clicked()

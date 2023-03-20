@@ -29,7 +29,7 @@
     </size>
    </property>
    <property name="currentIndex">
-    <number>1</number>
+    <number>0</number>
    </property>
    <widget class="QWidget" name="timetable_insert_tab">
     <attribute name="title">
@@ -583,6 +583,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <height>211</height>
       </rect>
      </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
+     </property>
      <row>
       <property name="text">
        <string>1교시</string>
@@ -666,6 +669,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <height>211</height>
       </rect>
      </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
+     </property>
      <row>
       <property name="text">
        <string>1교시</string>
@@ -730,6 +736,9 @@ li.checked::marker { content: &quot;\2612&quot;; }
        <width>541</width>
        <height>211</height>
       </rect>
+     </property>
+     <property name="selectionMode">
+      <enum>QAbstractItemView::NoSelection</enum>
      </property>
      <row>
       <property name="text">
@@ -1002,7 +1011,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <widget class="QLabel" name="new_MBTI">
      <property name="geometry">
       <rect>
-       <x>590</x>
+       <x>600</x>
        <y>130</y>
        <width>111</width>
        <height>16</height>
@@ -1119,7 +1128,7 @@ li.checked::marker { content: &quot;\2612&quot;; }
     <widget class="QLabel" name="ro_MBTI">
      <property name="geometry">
       <rect>
-       <x>590</x>
+       <x>600</x>
        <y>450</y>
        <width>111</width>
        <height>16</height>
